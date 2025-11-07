@@ -250,3 +250,140 @@ class HealthCheck(BaseModel):
     status: str
     version: str
     database: str
+
+
+# ============================================
+# AUTHENTICATION SCHEMAS
+# ============================================
+
+class UserRegister(BaseModel):
+    """User registration request"""
+    username: str = Field(..., min_length=3, max_length=50)
+    email: str = Field(..., pattern=r'^[^@]+@[^@]+\.[^@]+$')
+    password: str = Field(..., min_length=6)
+    full_name: Optional[str] = Field(None, max_length=150)
+
+
+class UserLogin(BaseModel):
+    """User login request"""
+    username: str
+    password: str
+
+
+class Token(BaseModel):
+    """JWT token response"""
+    access_token: str
+    token_type: str = "bearer"
+
+
+class TokenData(BaseModel):
+    """Token data"""
+    username: Optional[str] = None
+
+
+class UserProfile(BaseModel):
+    """User profile response"""
+    user_id: int
+    username: str
+    email: str
+    full_name: Optional[str] = None
+    is_admin: bool
+    profile_picture_url: Optional[str] = None
+    created_at: datetime
+    total_points: int = 0
+    total_predictions: int = 0
+    correct_predictions: int = 0
+    accuracy_percentage: float = 0.0
+    rank: Optional[int] = None
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
+# ============================================
+# PREDICTION SCHEMAS (User Predictions)
+# ============================================
+
+class UserMatchPredictionRequest(BaseModel):
+    """User match prediction submission"""
+    match_id: Optional[int] = None
+    home_team_id: int
+    away_team_id: int
+    predicted_outcome: str = Field(..., pattern="^(H|D|A)$")  # H=Home, D=Draw, A=Away
+    # Match statistics for ML comparison
+    home_points: int
+    home_wins: int
+    home_draws: int
+    home_losses: int
+    home_gf: int
+    home_ga: int
+    home_gd: int
+    away_points: int
+    away_wins: int
+    away_draws: int
+    away_losses: int
+    away_gf: int
+    away_ga: int
+    away_gd: int
+    home_xg: Optional[float] = None
+    away_xg: Optional[float] = None
+
+
+class UserSeasonPredictionRequest(BaseModel):
+    """User season prediction submission"""
+    team_id: int
+    predicted_points: int
+    predicted_position: int
+    # Current season statistics for ML comparison
+    wins: int
+    draws: int
+    losses: int
+    goals_for: int
+    goals_against: int
+    goal_diff: int
+    points: int
+
+
+class UserPredictionResponse(BaseModel):
+    """User prediction response"""
+    prediction_id: int
+    user_id: int
+    prediction_type: str
+    predicted_value: Optional[int] = None
+    predicted_team_id: Optional[int] = None
+    predicted_player_id: Optional[int] = None
+    created_at: datetime
+    is_correct: Optional[bool] = None
+    points_earned: int = 0
+    ml_prediction: Optional[dict] = None  # ML model's prediction for comparison
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
+# ============================================
+# FOLLOW SCHEMAS
+# ============================================
+
+class FollowTeamRequest(BaseModel):
+    """Follow team request"""
+    team_id: int
+
+
+class FollowPlayerRequest(BaseModel):
+    """Follow player request"""
+    player_id: int
+
+
+# ============================================
+# LEADERBOARD SCHEMAS
+# ============================================
+
+class LeaderboardEntry(BaseModel):
+    """Leaderboard entry"""
+    rank: int
+    username: str
+    total_points: int
+    total_predictions: int
+    correct_predictions: int
+    accuracy_percentage: float
+    
+    model_config = ConfigDict(from_attributes=True)

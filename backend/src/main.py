@@ -5,7 +5,7 @@ from sqlalchemy import text
 
 from src.core.config import get_settings
 from src.core.database import get_db, engine, Base
-from src.api.routes import teams, analytics
+from src.api.routes import teams, analytics, auth, view, predictions, follow, profile, admin
 from src.schemas.schemas import HealthCheck
 
 settings = get_settings()
@@ -29,8 +29,15 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(teams.router, prefix=settings.API_V1_PREFIX)
+app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+app.include_router(view.router, prefix=settings.API_V1_PREFIX)
 app.include_router(analytics.router, prefix=settings.API_V1_PREFIX)
+app.include_router(predictions.router, prefix=settings.API_V1_PREFIX)
+app.include_router(follow.router, prefix=settings.API_V1_PREFIX)
+app.include_router(profile.router, prefix=settings.API_V1_PREFIX)
+app.include_router(admin.router, prefix=settings.API_V1_PREFIX)
+# Keep teams router for admin operations (view router handles public viewing)
+app.include_router(teams.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/", response_model=HealthCheck)

@@ -12,17 +12,17 @@ from src.models import models
 
 settings = get_settings()
 
-pwd_context = CryptContext(schemes=["bycrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_PREFIX}/auth/login")
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-def get_password_hash(password):
+def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
-def create_access_token(data, expires_delta = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
 
     if expires_delta:
@@ -34,18 +34,21 @@ def create_access_token(data, expires_delta = None):
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
-def decode_access_token(token):
+def decode_access_token(token: str) -> Optional[dict]:
     try: 
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload
     except JWTError:
         return None
-    
-def get_current_user(token, db):
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> models.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate: Bearer"}
+        headers={"WWW-Authenticate": "Bearer"}
     )
 
     payload = decode_access_token(token)
@@ -65,7 +68,9 @@ def get_current_user(token, db):
     
     return user
 
-def get_current_admin_user(current_user = Depends(get_current_user)):
+async def get_current_admin_user(
+    current_user: models.User = Depends(get_current_user)
+) -> models.User:
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
