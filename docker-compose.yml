@@ -13,7 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./sql:/docker-entrypoint-initdb.d/sql
+      - ./database/sql/01_schema:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U spark_user -d spark_db"]
       interval: 10s
@@ -21,6 +21,24 @@ services:
       retries: 5
     networks:
       - spark_network
+
+  scraper:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.scraper
+    container_name: spark_scraper
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: spark_postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: spark_db
+      POSTGRES_USER: spark_user
+      POSTGRES_PASSWORD: spark_password_2024
+    networks:
+      - spark_network
+    restart: "no"
 
   adminer:
     image: adminer:latest

@@ -57,7 +57,21 @@ def get_leaderboard(
         .all()
     )
     
-    return entries
+    # Calculate ranks and ensure they're not None
+    result = []
+    for idx, entry in enumerate(entries, start=skip + 1):
+        if entry.rank is None:
+            entry.rank = idx
+        result.append({
+            "rank": entry.rank,
+            "username": entry.username,
+            "total_points": entry.total_points,
+            "total_predictions": entry.total_predictions,
+            "correct_predictions": entry.correct_predictions,
+            "accuracy_percentage": float(entry.accuracy_percentage) if entry.accuracy_percentage else 0.0
+        })
+    
+    return result
 
 
 @router.get("/leaderboard/top", response_model=List[schemas.LeaderboardEntry])
@@ -73,5 +87,19 @@ def get_top_leaderboard(
         .all()
     )
     
-    return entries
+    # Calculate ranks and ensure they're not None
+    result = []
+    for idx, entry in enumerate(entries, 1):
+        if entry.rank is None:
+            entry.rank = idx
+        result.append({
+            "rank": entry.rank,
+            "username": entry.username,
+            "total_points": entry.total_points,
+            "total_predictions": entry.total_predictions,
+            "correct_predictions": entry.correct_predictions,
+            "accuracy_percentage": float(entry.accuracy_percentage) if entry.accuracy_percentage else 0.0
+        })
+    
+    return result
 
