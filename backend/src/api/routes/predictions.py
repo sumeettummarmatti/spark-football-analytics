@@ -113,31 +113,37 @@ def submit_match_prediction(
     get_team_or_404(prediction.away_team_id, db)
     
     # Get ML prediction
-    match_predictor = get_match_predictor()
-    match_request = schemas.MatchPredictionRequest(
-        home_team_id=prediction.home_team_id,
-        away_team_id=prediction.away_team_id,
-        home_points=prediction.home_points,
-        home_wins=prediction.home_wins,
-        home_draws=prediction.home_draws,
-        home_losses=prediction.home_losses,
-        home_gf=prediction.home_gf,
-        home_ga=prediction.home_ga,
-        home_gd=prediction.home_gd,
-        away_points=prediction.away_points,
-        away_wins=prediction.away_wins,
-        away_draws=prediction.away_draws,
-        away_losses=prediction.away_losses,
-        away_gf=prediction.away_gf,
-        away_ga=prediction.away_ga,
-        away_gd=prediction.away_gd,
-        home_xg=prediction.home_xg,
-        away_xg=prediction.away_xg
-    )
-    
-    features_df = prepare_match_features(match_request, match_predictor)
-    ml_predictions = match_predictor.predict(features_df)
-    ml_prediction = ml_predictions[0] if ml_predictions else {}
+    try:
+        match_predictor = get_match_predictor()
+        match_request = schemas.MatchPredictionRequest(
+            home_team_id=prediction.home_team_id,
+            away_team_id=prediction.away_team_id,
+            home_points=prediction.home_points,
+            home_wins=prediction.home_wins,
+            home_draws=prediction.home_draws,
+            home_losses=prediction.home_losses,
+            home_gf=prediction.home_gf,
+            home_ga=prediction.home_ga,
+            home_gd=prediction.home_gd,
+            away_points=prediction.away_points,
+            away_wins=prediction.away_wins,
+            away_draws=prediction.away_draws,
+            away_losses=prediction.away_losses,
+            away_gf=prediction.away_gf,
+            away_ga=prediction.away_ga,
+            away_gd=prediction.away_gd,
+            home_xg=prediction.home_xg,
+            away_xg=prediction.away_xg
+        )
+        
+        features_df = prepare_match_features(match_request, match_predictor)
+        ml_predictions = match_predictor.predict(features_df)
+        ml_prediction = ml_predictions[0] if ml_predictions else {}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate ML prediction: {str(e)}"
+        )
     
     # Determine ML predicted outcome
     home_prob = ml_prediction.get('home_win_prob', 0)
@@ -238,23 +244,32 @@ def submit_season_prediction(
     get_team_or_404(prediction.team_id, db)
     
     # Get ML prediction
-    season_predictor = get_season_predictor()
-    season_request = schemas.SeasonPredictionRequest(
-        team_id=prediction.team_id,
-        wins=prediction.wins,
-        draws=prediction.draws,
-        losses=prediction.losses,
-        goals_for=prediction.goals_for,
-        goals_against=prediction.goals_against,
-        goal_diff=prediction.goal_diff,
-        points=prediction.points
-    )
-    
-    features_df = prepare_season_features(season_request, season_predictor)
-    ml_predictions = season_predictor.predict(features_df)
-    
-    ml_points = float(ml_predictions['predicted_points'])
-    ml_position = float(ml_predictions['predicted_position'])
+    try:
+        season_predictor = get_season_predictor()
+        season_request = schemas.SeasonPredictionRequest(
+            team_id=prediction.team_id,
+            wins=prediction.wins,
+            draws=prediction.draws,
+            losses=prediction.losses,
+            goals_for=prediction.goals_for,
+            goals_against=prediction.goals_against,
+            goal_diff=prediction.goal_diff,
+            points=prediction.points
+        )
+        
+        features_df = prepare_season_features(season_request, season_predictor)
+        ml_predictions = season_predictor.predict(features_df)
+        
+        if ml_predictions is None or 'predicted_points' not in ml_predictions:
+            raise ValueError("Invalid prediction response from ML model")
+        
+        ml_points = float(ml_predictions['predicted_points'])
+        ml_position = float(ml_predictions['predicted_position'])
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate ML prediction: {str(e)}"
+        )
     
     # Compare predictions (within 5% for points, within 1 position for position)
     points_diff = abs(prediction.predicted_points - ml_points) / ml_points if ml_points > 0 else 1
