@@ -267,9 +267,9 @@ class UserPrediction(Base):
     predicted_team = relationship("Team", foreign_keys=[predicted_team_id])
     predicted_player = relationship("Player", foreign_keys=[predicted_player_id])
     
-    __table_args__ = (
-        UniqueConstraint('user_id', 'season_id', 'prediction_type', name='uk_user_season_prediction'),
-    )
+    # __table_args__ = (
+    #     UniqueConstraint('user_id', 'season_id', 'prediction_type', name='uk_user_season_prediction'),
+    # )
 
 
 class UserLeaderboard(Base):

@@ -16,31 +16,32 @@ const getTeamLogo = (teamName: string, fbrefId?: string) => {
     'Sunderland': 'Sunderland AFC.png',
     'Luton Town': 'Luton Town.png',
     'Burnley': 'Burnley FC.png',
-    'Sheffield Utd': 'Sheffield United.png',
+    'Sheffield United': 'Sheffield United.png',
     'Manchester City': 'Manchester City.png',
     'Arsenal': 'Arsenal FC.png',
-    'Manchester Utd': 'Manchester United.png',
-    'Newcastle Utd': 'Newcastle United.png',
+    'Manchester United': 'Manchester United.png',
+    'Newcastle United': 'Newcastle United.png',
     'Liverpool': 'Liverpool FC.png',
-    'Brighton': 'Brighton & Hove Albion.png',
+    'Brighton & Hove Albion': 'Brighton & Hove Albion.png',
     'Aston Villa': 'Aston Villa.png',
-    'Tottenham': 'Tottenham Hotspur.png',
+    'Tottenham Hotspur': 'Tottenham Hotspur.png',
     'Brentford': 'Brentford FC.png',
     'Fulham': 'Fulham FC.png',
     'Crystal Palace': 'Crystal Palace.png',
     'Chelsea': 'Chelsea FC.png',
-    'Wolves': 'Wolverhampton Wanderers.png',
-    'West Ham': 'West Ham United.png',
+    'Wolverhampton Wanderers': 'Wolverhampton Wanderers.png',
+    'West Ham United': 'West Ham United.png',
     'Bournemouth': 'AFC Bournemouth.png',
-    "Nott'ham Forest": 'Nottingham Forest.png',
+    'Nottingham Forest': 'Nottingham Forest.png',
     'Everton': 'Everton FC.png',
     'Leeds United': 'Leeds United.png',
     'Leicester City': 'Leicester City.png',
     'Southampton': 'Southampton.png',
+    'Ipswich Town': 'Ipswich Town.png',
   };
 
   const fileName = teamLogoFiles[teamName];
-  
+
   if (fileName) {
     return `/assets/team_logos/${fileName}`;
   }
@@ -77,7 +78,7 @@ export default function Teams() {
         </h1>
         <p className="text-gray-600 dark:text-gray-400">Explore all teams and their details</p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {teams.map((team, index) => (
           <Link
@@ -88,7 +89,7 @@ export default function Teams() {
           >
             {/* Gradient overlay on hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary-500/0 to-blue-500/0 group-hover:from-primary-500/10 group-hover:to-blue-500/10 transition-all duration-300"></div>
-            
+
             <div className="p-6 relative z-10">
               {/* Team Logo */}
               <div className="flex justify-center mb-4">
@@ -106,20 +107,20 @@ export default function Teams() {
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
               </div>
-              
+
               {/* Team Info */}
               <div className="text-center">
                 <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                   {team.name}
                 </h2>
-                
+
                 {team.city && (
                   <div className="flex items-center justify-center gap-1 text-sm text-gray-600 dark:text-gray-400 mb-1">
                     <MapPin className="h-4 w-4" />
                     <span>{team.city}</span>
                   </div>
                 )}
-                
+
                 {team.stadium_name && (
                   <div className="flex items-center justify-center gap-1 text-xs text-gray-500 dark:text-gray-500">
                     <Building2 className="h-3 w-3" />
@@ -127,7 +128,7 @@ export default function Teams() {
                   </div>
                 )}
               </div>
-              
+
               {/* Hover effect indicator */}
               <div className="mt-4 flex justify-center">
                 <div className="w-0 h-0.5 bg-gradient-to-r from-primary-500 to-blue-500 group-hover:w-full transition-all duration-300"></div>
