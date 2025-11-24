@@ -46,7 +46,43 @@ export default function TeamDetail() {
 
   if (loading || !team) return <div>Loading...</div>;
 
-  const getTeamLogo = (teamName: string) => {
+  // Helper function to get team logo URL - Matching Teams.tsx implementation
+  const getTeamLogo = (teamName: string, fbrefId?: string) => {
+    // Map database names to EXACT filenames in your team_logos folder
+    const teamLogoFiles: Record<string, string> = {
+      'Sunderland': 'Sunderland AFC.png',
+      'Luton Town': 'Luton Town.png',
+      'Burnley': 'Burnley FC.png',
+      'Sheffield United': 'Sheffield United.png',
+      'Manchester City': 'Manchester City.png',
+      'Arsenal': 'Arsenal FC.png',
+      'Manchester United': 'Manchester United.png',
+      'Newcastle United': 'Newcastle United.png',
+      'Liverpool': 'Liverpool FC.png',
+      'Brighton & Hove Albion': 'Brighton & Hove Albion.png',
+      'Aston Villa': 'Aston Villa.png',
+      'Tottenham Hotspur': 'Tottenham Hotspur.png',
+      'Brentford': 'Brentford FC.png',
+      'Fulham': 'Fulham FC.png',
+      'Crystal Palace': 'Crystal Palace.png',
+      'Chelsea': 'Chelsea FC.png',
+      'Wolverhampton Wanderers': 'Wolverhampton Wanderers.png',
+      'West Ham United': 'West Ham United.png',
+      'Bournemouth': 'AFC Bournemouth.png',
+      'Nottingham Forest': 'Nottingham Forest.png',
+      'Everton': 'Everton FC.png',
+      'Leeds United': 'Leeds United.png',
+      'Leicester City': 'Leicester City.png',
+      'Southampton': 'Southampton.png',
+      'Ipswich Town': 'Ipswich Town.png',
+    };
+
+    const fileName = teamLogoFiles[teamName];
+
+    if (fileName) {
+      return `/assets/team_logos/${fileName}`;
+    }
+
     const encodedName = encodeURIComponent(teamName);
     return `https://ui-avatars.com/api/?name=${encodedName}&background=random&size=200&bold=true`;
   };
@@ -88,11 +124,10 @@ export default function TeamDetail() {
             {isAuthenticated && (
               <button
                 onClick={handleFollow}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
-                  isFollowing
+                className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${isFollowing
                     ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
                     : 'bg-white text-primary-600 hover:bg-white/90 shadow-lg'
-                }`}
+                  }`}
               >
                 <Heart className={`h-5 w-5 ${isFollowing ? 'fill-current' : ''}`} />
                 <span>{isFollowing ? 'Following' : 'Follow Team'}</span>
