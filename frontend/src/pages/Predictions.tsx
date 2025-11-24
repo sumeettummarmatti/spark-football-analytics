@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { predictionsAPI, viewAPI } from '../services/api';
+import { useAuthStore } from '../store/authStore';
 import type { Team } from '../types';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 
@@ -43,6 +44,8 @@ export default function Predictions() {
       const data = await predictionsAPI.submitMatchPrediction(formData);
       setResult(data);
       predictionsAPI.checkEligibility('match_outcome').then(setEligibility);
+      // Refresh user points in navbar
+      useAuthStore.getState().refreshUser();
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to submit prediction');
     } finally {
@@ -74,10 +77,10 @@ export default function Predictions() {
             <p className="font-semibold text-green-800 dark:text-green-200">Prediction Submitted!</p>
           </div>
           <p className="text-green-700 dark:text-green-300">
-            ML Prediction: {result.ml_prediction?.predicted_outcome}
+            ML Prediction: {result.ml_prediction?.predicted_outcome === 'H' ? 'Home Win' : result.ml_prediction?.predicted_outcome === 'D' ? 'Draw' : 'Away Win'}
           </p>
           <p className="text-green-700 dark:text-green-300">
-            Your Prediction: {formData.predicted_outcome}
+            Your Prediction: {formData.predicted_outcome === 'H' ? 'Home Win' : formData.predicted_outcome === 'D' ? 'Draw' : 'Away Win'}
           </p>
           <p className="text-green-700 dark:text-green-300">
             Points Earned: {result.points_earned}
